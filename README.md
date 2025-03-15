@@ -68,8 +68,11 @@
 3. **重启服务器**：
   - 重启你的 Minecraft 服务器以加载新插件
 
-4. **完成绑定**：
-  - 按照控制台提示完成服务器与机器人的绑定操作
+4. **添加机器人**
+- [加入交流群](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=N6tVRxGR8sDwYHBx9YgAhkqRTp1gseyk&authKey=M7Fd3Op6nHjXjSXefBtHBPqIq2wtX8AfufZor9DrfRrJkhyS2rohkt7iuOSwbtn8&noverify=0&group_code=1005746321) 点击HuHo_Bot头像并添加到群聊
+
+5. **完成绑定**：
+- 按照控制台提示完成服务器与机器人的绑定操作
 
 ### 高级配置（可选）
 
