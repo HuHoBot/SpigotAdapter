@@ -59,6 +59,11 @@ jobs:
     needs: build
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    # 新增权限配置
+    permissions:
+      contents: write  # 必须的权限
+      actions: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -68,48 +73,41 @@ jobs:
 
       - name: Extract release info
         id: changelog
-        run: |          # 获取标签名（如 v1.2.1）
+        run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
           
-          # 使用 awk 提取对应版本的更新日志
-          CHANGELOG_CONTENT=$(awk -v version="$TAG_NAME" '
-          BEGIN {RS="## "; FS="\n"}
-          $1 ~ "\\[" version "\\]" {
-           sub(/\[.*\] - .*\n/, "")  # 移除标题行
-           gsub(/`/, "\\`")          # 转义反引号
-           gsub(/\"/, "\\\"")        # 转义双引号
-           print
-           exit
-          }
+          # 修复：使用正确的标签格式匹配
+          VERSION=${TAG_NAME#v}  # 去除v前缀（如果CHANGELOG使用纯版本号）
+          
+          CHANGELOG_CONTENT=$(awk -v version="[v$VERSION]" '
+            BEGIN {RS="## "; FS="\n"}
+            $1 ~ version {
+              sub(/\[.*\] - .*\n/, "")
+              gsub(/`/, "\\`")
+              gsub(/"/, "\\\"")
+              print
+              exit
+            }
           ' CHANGELOG.md)
 
-          # 多行内容输出处理
           EOF_MARKER=$(openssl rand -base64 12)
           echo "body<<$EOF_MARKER" >> $GITHUB_OUTPUT
           echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "### 构建信息" >> $GITHUB_OUTPUT
-          echo "- 构建时间: ${{ github.run_created_at }}" >> $GITHUB_OUTPUT
-          echo "- 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_OUTPUT
           echo "$EOF_MARKER" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          release_name: ${{ github.ref_name }}
-          body: ${{ steps.changelog.outputs.body }}
-          draft: false
-          prerelease: false
+          # 添加标签名输出
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v1  # 改用更可靠的 Action
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build/libs/HuHoBot-*.jar
-          asset_name: HuHoBot-${{ steps.release_info.outputs.tag_name }}-Spigot.jar
-          asset_content_type: application/java-archive
+          tag_name: ${{ steps.changelog.outputs.tag_name }}
+          name: Release ${{ steps.changelog.outputs.tag_name }}
+          body: |
+            ${{ steps.changelog.outputs.body }}
+
+            ### 构建信息
+            - 构建时间: ${{ github.run_created_at }}
+            - 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+          files: |
+            build/libs/HuHoBot-*.jar
