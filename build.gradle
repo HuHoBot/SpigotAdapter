@@ -1,0 +1,107 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'cn.huohuas001'
+version = '1.2.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "spigotmc-repo"
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compileOnly "org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT"
+    //compileOnly 'org.bukkit:bukkit:1.13-R0.1-SNAPSHOT'
+    compileOnly 'org.jetbrains:annotations:13.0'
+    implementation 'org.java-websocket:Java-WebSocket:1.5.4'
+    implementation 'com.alibaba.fastjson2:fastjson2:2.0.52'
+    implementation 'com.github.Anon8281:UniversalScheduler:0.1.6'
+}
+
+jar {
+    archiveFileName = 'HuHoBot.jar'
+    manifest {
+        attributes 'Main-Class': 'cn.huohuas001.huHoBot'
+    }
+}
+
+shadowJar {
+    archiveFileName = "HuHoBot-${project.version}-Spigot.jar"
+    relocate 'com.github.Anon8281.universalScheduler', 'cn.huohuas001.huHoBot.universalScheduler'
+    // 排除不必要的依赖（Bukkit 服务端已提供）
+    minimize()
+}
+
+// 新增配置生成任务
+task generateServerConfig(type: Copy) {
+    group = 'Build'
+    description = '生成服务器配置类'
+
+    from 'src/main/templates/java'
+    into 'src/main/generated/java'
+
+    // 新增文件名处理
+    include '**/*.template'
+    rename { filename ->
+        filename.replace('.template', '')
+    }
+
+    filter { line ->
+        line.replace('${WS_SERVER_URL}',
+                project.findProperty('wsServerUrl') ?: 'ws://127.0.0.1:8080')
+    }
+
+    filteringCharset = 'UTF-8'
+}
+
+
+// 将生成的代码目录加入源码集
+sourceSets.main.java.srcDir 'src/main/generated/java'
+
+// 确保编译前先执行生成任务
+compileJava.dependsOn generateServerConfig
+
+clean {
+    delete 'src/main/generated'
+}
+
+
+def targetJavaVersion = 8
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release.set(targetJavaVersion)
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+    filesMatching('config.yml') {
+        expand props
+    }
+}

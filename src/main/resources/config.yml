@@ -1,0 +1,14 @@
+serverId: null
+hashKey: null
+chatFormatGame: "<{name}> {msg}"
+chatFormatGroup: "群:<{nick}> {msg}"
+motdUrl: "play.hypixel.net:25565"
+addWhiteListCmd: "whitelist add {name}"
+delWhiteListCmd: "whitelist remove {name}"
+customCommand:
+  - key: "加白名"
+    command: "whitelist add &1"
+    permission: 0
+  - key: "管理加白名"
+    command: "whitelist add &1"
+    permission: 1
