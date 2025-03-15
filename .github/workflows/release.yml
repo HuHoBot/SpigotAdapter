@@ -50,9 +50,10 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts
+          name: release-artifacts
           path: |
             build/libs/HuHoBot-*.jar
+          retention-days: 1  # 仅保留1天临时文件
 
   release:
     name: Create Release
@@ -98,6 +99,12 @@ jobs:
           # 添加标签名输出
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: artifacts
+
       - name: Create Release
         uses: softprops/action-gh-release@v1  # 改用更可靠的 Action
         with:
@@ -110,4 +117,4 @@ jobs:
             - 构建时间: ${{ github.run_created_at }}
             - 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
           files: |
-            build/libs/HuHoBot-*.jar
+            artifacts/HuHoBot-*.jar
