@@ -1,0 +1,105 @@
+name: Java CI & Release
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+    paths:
+      - '.github/workflows/release.yml'
+      - 'src/**'
+      - 'build.gradle'
+    tags:
+      - 'v*' # 匹配 v 开头的标签
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - 'src/**'
+      - 'build.gradle'
+
+env:
+  GRADLE_VERSION: 7.6.3
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 获取完整提交历史
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        env:
+          WS_SERVER_URL: ${{ secrets.WS_SERVER_URL }}
+        run: |
+          ./gradlew shadowJar \
+            -PwsServerUrl="$WS_SERVER_URL" \
+            -x test \
+            -Dorg.gradle.daemon=false
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: |
+            build/libs/HuHoBot-*.jar
+
+  release:
+    name: Create Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get release info
+        id: release_info
+        run: |
+          # 获取标签名 (去除 refs/tags/ 前缀)
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+          # 获取最新提交信息
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release_info.outputs.tag_name }}
+          release_name: Release ${{ steps.release_info.outputs.tag_name }}
+          body: |
+            ### 版本更新说明
+            ${{ steps.release_info.outputs.commit_msg }}
+
+            ### 构建信息
+            - 构建时间: ${{ github.run_created_at }}
+            - 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/libs/HuHoBot-*.jar
+          asset_name: HuHoBot-${{ steps.release_info.outputs.tag_name }}-Spigot.jar
+          asset_content_type: application/java-archive
