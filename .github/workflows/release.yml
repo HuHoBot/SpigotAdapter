@@ -66,31 +66,41 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get release info
-        id: release_info
-        run: |
-          # 获取标签名 (去除 refs/tags/ 前缀)
+      - name: Extract release info
+        id: changelog
+        run: |          # 获取标签名（如 v1.2.1）
           TAG_NAME=${GITHUB_REF#refs/tags/}
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          
+          # 使用 awk 提取对应版本的更新日志
+          CHANGELOG_CONTENT=$(awk -v version="$TAG_NAME" '
+          BEGIN {RS="## "; FS="\n"}
+          $1 ~ "\\[" version "\\]" {
+           sub(/\[.*\] - .*\n/, "")  # 移除标题行
+           gsub(/`/, "\\`")          # 转义反引号
+           gsub(/\"/, "\\\"")        # 转义双引号
+           print
+           exit
+          }
+          ' CHANGELOG.md)
 
-          # 获取最新提交信息
-          COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "commit_msg=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          # 多行内容输出处理
+          EOF_MARKER=$(openssl rand -base64 12)
+          echo "body<<$EOF_MARKER" >> $GITHUB_OUTPUT
+          echo "$CHANGELOG_CONTENT" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### 构建信息" >> $GITHUB_OUTPUT
+          echo "- 构建时间: ${{ github.run_created_at }}" >> $GITHUB_OUTPUT
+          echo "- 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_OUTPUT
+          echo "$EOF_MARKER" >> $GITHUB_OUTPUT
 
       - name: Create Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.release_info.outputs.tag_name }}
-          release_name: Release ${{ steps.release_info.outputs.tag_name }}
-          body: |
-            ### 版本更新说明
-            ${{ steps.release_info.outputs.commit_msg }}
-
-            ### 构建信息
-            - 构建时间: ${{ github.run_created_at }}
-            - 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.body }}
           draft: false
           prerelease: false
 
