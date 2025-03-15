@@ -79,4 +79,9 @@ public class BotCustomCommand extends Event implements Cancellable {
         WsClient client = HuHoBot.getClientManager().getClient();
         client.respone(msg, type, packId);
     }
+
+    public void respone(JSONObject msg, String type) {
+        WsClient client = HuHoBot.getClientManager().getClient();
+        client.respone(msg.toJSONString(), type, packId);
+    }
 }
