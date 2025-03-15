@@ -4,6 +4,7 @@
 /.idea/
 /out/
 src/main/generated/
+bin/
 
 # Ignore Gradle GUI config
 gradle-app.setting
