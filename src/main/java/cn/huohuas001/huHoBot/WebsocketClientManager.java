@@ -1,17 +1,16 @@
 package cn.huohuas001.huHoBot;
 
+import cn.huohuas001.config.ServerConfig;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import net.md_5.bungee.api.ChatColor;
-import cn.huohuas001.config.ServerConfig;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
 public class WebsocketClientManager {
     private static WsClient client; //Websocket客户端
-    //private static String websocketUrl = "ws://119.91.100.129:8888"; //Websocket地址
-    //private static String websocketUrl = "ws://127.0.0.1:8888"; //Websocket地址
     private static String websocketUrl = ServerConfig.WS_SERVER_URL;
     private final long RECONNECT_DELAY = 5; // 重连延迟时间，单位为秒
     private final int MAX_RECONNECT_ATTEMPTS = 5; // 最大重连尝试次数
