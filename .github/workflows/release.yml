@@ -109,7 +109,7 @@ jobs:
         uses: softprops/action-gh-release@v1  # 改用更可靠的 Action
         with:
           tag_name: ${{ steps.changelog.outputs.tag_name }}
-          name: Release ${{ steps.changelog.outputs.tag_name }}
+          name: HuHoBot ${{ steps.changelog.outputs.tag_name }}
           body: |
             ${{ steps.changelog.outputs.body }}
 
