@@ -2,7 +2,7 @@ name: Java 8 CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main","dev" ]
     paths:
       - '.github/workflows/gradle.yml'
       - 'src/**'
