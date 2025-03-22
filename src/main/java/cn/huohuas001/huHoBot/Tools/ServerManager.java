@@ -62,7 +62,7 @@ public class ServerManager {
 
         synchronized (returnStr) {
             try {
-                returnStr.wait();
+                returnStr.wait(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

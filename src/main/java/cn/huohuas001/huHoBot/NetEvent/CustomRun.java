@@ -28,6 +28,10 @@ public class CustomRun extends EventRunner {
                 int replaceNum = i + 1;
                 command = command.replace("&" + String.valueOf(replaceNum), param.get(i));
             }
+            if (result.getPermission() > 0) {
+                respone("权限不足，若您是管理员，请使用/管理员执行", "error");
+                return;
+            }
             runCommand(command);
         }
 
