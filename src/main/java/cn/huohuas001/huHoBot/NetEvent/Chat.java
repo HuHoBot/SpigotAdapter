@@ -9,7 +9,7 @@ public class Chat extends EventRunner {
         String nick = body.getString("nick");
         String msg = body.getString("msg");
         FileConfiguration config = this.getConfig();
-        String message = config.getString("chatFormatGroup").replace("{nick}", nick).replace("{msg}", msg);
+        String message = config.getString("chatFormat.from_group").replace("{nick}", nick).replace("{msg}", msg);
         HuHoBot.getPlugin().getServer().broadcastMessage(message);
         return true;
     }

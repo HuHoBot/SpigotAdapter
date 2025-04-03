@@ -8,7 +8,6 @@ import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskSchedule
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,14 +15,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public final class HuHoBot extends JavaPlugin {
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(HuHoBot.class); //Logger
+    //private static final org.slf4j.Logger log = LoggerFactory.getLogger(HuHoBot.class); //Logger
     private static final String pluginName = "HuHoBot"; //插件名
     private static HuHoBot plugin; //插件对象
     private static WebsocketClientManager clientManager; //Websocket客户端
     private static TaskScheduler scheduler; //计划对象
     //NetEvent对象
     public bindRequest bindRequestObj;
-    private Map<String, EventRunner> eventList = new HashMap<>(); //事件列表
+    private final Map<String, EventRunner> eventList = new HashMap<>(); //事件列表
     private Logger logger; //Logger
     private CustomCommand customCommand; //自定义命令对象
 
@@ -65,7 +64,13 @@ public final class HuHoBot extends JavaPlugin {
         plugin = this;
         logger = getLogger();
         scheduler = UniversalScheduler.getScheduler(this);
-        this.saveDefaultConfig();
+
+        ConfigManager configManager = new ConfigManager(this);
+
+        if (configManager.checkConfig()) {
+            configManager.migrateConfig();
+        }
+
 
         //检测是否为null
         FileConfiguration config = getConfig();
@@ -182,7 +187,7 @@ public final class HuHoBot extends JavaPlugin {
     /**
      * 运行命令
      *
-     * @param command
+     * @param command 命令
      */
     public void runCommand(String command) {
         String newPackId = PackId.getPackID();

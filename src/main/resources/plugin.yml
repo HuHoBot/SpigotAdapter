@@ -2,9 +2,12 @@ name: HuHoBot
 version: '${version}'
 main: cn.huohuas001.huHoBot.HuHoBot
 api-version: 1.13
-authors: [ HuoHuas001 ]
+authors:
+  - "HuoHuas001"
 description: HuHoBot Spigot Adapter
 commands:
   huhobot:
     description: HuHoBot's control command
     usage: /huhobot
+softdepend:
+  - "PlaceholderAPI"

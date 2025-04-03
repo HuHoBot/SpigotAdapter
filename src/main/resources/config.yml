@@ -1,10 +1,22 @@
 serverId: null
 hashKey: null
-chatFormatGame: "<{name}> {msg}"
-chatFormatGroup: "群:<{nick}> {msg}"
-motdUrl: "play.hypixel.net:25565"
-addWhiteListCmd: "whitelist add {name}"
-delWhiteListCmd: "whitelist remove {name}"
+
+chatFormat:
+  from_game: "<{name}> {msg}"
+  from_group: "群:<{nick}> {msg}"
+
+motd:
+  server_ip: "play.hypixel.net"
+  server_port: 25565
+  api: "https://motdbe.blackbe.work/status_img/java?host={server_ip}:{server_port}"
+  text: "共{online}人在线"
+  output_online_list: true
+  post_img: true
+
+whiteList:
+  add: "whitelist add {name}"
+  del: "whitelist remove {name}"
+
 customCommand:
   - key: "加白名"
     command: "whitelist add &1"
