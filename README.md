@@ -93,16 +93,22 @@ serverId: null
 #不用管
 hashKey: null
 
-#不用管
-"chatFormatGame": "<{name}> {msg}"
-#群内消息转发到服内时的文本
-"chatFormatGroup": "群:<{nick}> {msg}"
-#使用"/查服"时的Motd图片地址（改成你的进服地址）
-motdUrl: "play.hypixel.net:25565"
-#添加白名单的指令
-addWhiteListCmd: "whitelist add {name}"
-#删除白名单的指令
-delWhiteListCmd: "whitelist remove {name}"
+chatFormat:
+  from_game: "<{name}> {msg}" #不用管
+  from_group: "群:<{nick}> {msg}" #群内消息转发到服内时的文本
+
+motd:
+  server_ip: "play.hypixel.net" #使用"/查在线"时的Motd图片地址（改成你的进服地址）
+  server_port: 25565 #使用"/查在线"时的Motd图片端口（改成你的进服端口）
+  api: "https://motdbe.blackbe.work/status_img/java?host={server_ip}:{server_port}" #使用"/查在线"时的Motd图片地址Api（无特殊需求勿动）（必须返回图片）
+  text: "共{online}人在线" #使用"/查在线"时的Motd文本，可使用PlaceholderAPI，留空不显示
+  output_online_list: true #是否显示在线列表
+  post_img: true #是否显示Motd图片
+
+whiteList:
+  add: "whitelist add {name}" #添加白名单的指令
+  del: "whitelist remove {name}" #删除白名单的指令
+
 #自定义执行命令
 customCommand:
   - key: "加白名" #执行关键词，可使用"/执行 关键词 参数1 参数2"来执行自定义命令
@@ -112,6 +118,7 @@ customCommand:
   - key: "管理加白名"
     command: "whitelist add &1"
     permission: 1
+
 ```
 
 ## ❓ 常见问题
