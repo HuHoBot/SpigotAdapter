@@ -11,3 +11,4 @@ commands:
     usage: /huhobot
 softdepend:
   - "PlaceholderAPI"
+folia-supported: true
