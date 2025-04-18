@@ -26,7 +26,7 @@ public class CustomRunAdmin extends EventRunner {
             String command = result.getCommand();
             for (int i = 0; i < param.size(); i++) {
                 int replaceNum = i + 1;
-                command = command.replace("&" + String.valueOf(replaceNum), param.get(i));
+                command = command.replace("&" + replaceNum, param.get(i));
             }
             runCommand(command);
         }
@@ -40,7 +40,7 @@ public class CustomRunAdmin extends EventRunner {
 
     @Override
     public boolean run() {
-        Bukkit.getScheduler().runTask(plugin, this::CallEvent);
+        HuHoBot.getScheduler().runTask(this::CallEvent);
 
         return false;
     }

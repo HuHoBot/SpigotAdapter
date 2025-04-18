@@ -9,8 +9,10 @@ import java.util.Collection;
 
 public class QueryOnline extends EventRunner {
     public String setPlaceholder(String oriText) {
-        String text = PlaceholderAPI.setPlaceholders(null, oriText);
-        return text;
+        if (!HuHoBot.getPlugin().getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            return oriText;
+        }
+        return PlaceholderAPI.setPlaceholders(null, oriText);
     }
     @Override
     public boolean run() {
@@ -39,7 +41,7 @@ public class QueryOnline extends EventRunner {
         // 构造JSON对象
         JSONObject list = new JSONObject();
         list.put("msg", onlineNameString);
-        list.put("url", server_ip + ":" + String.valueOf(server_port));
+        list.put("url", server_ip + ":" + server_port);
         list.put("imgUrl", api.replace("{server_ip}", server_ip).replace("{server_port}", String.valueOf(server_port)));
         list.put("post_img", getConfig().getBoolean("motd.post_img"));
         list.put("serverType", "java");

@@ -26,7 +26,7 @@ public class CustomRun extends EventRunner {
             String command = result.getCommand();
             for (int i = 0; i < param.size(); i++) {
                 int replaceNum = i + 1;
-                command = command.replace("&" + String.valueOf(replaceNum), param.get(i));
+                command = command.replace("&" + replaceNum, param.get(i));
             }
             if (result.getPermission() > 0) {
                 respone("权限不足，若您是管理员，请使用/管理员执行", "error");
@@ -43,7 +43,7 @@ public class CustomRun extends EventRunner {
 
     @Override
     public boolean run() {
-        Bukkit.getScheduler().runTask(plugin, this::CallEvent);
+        HuHoBot.getScheduler().runTask(this::CallEvent);
 
         return true;
     }

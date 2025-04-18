@@ -101,13 +101,13 @@ public final class HuHoBot extends JavaPlugin {
         clientManager.connectServer();
 
 
-        new UpdateChecker(this, 121838).getVersion(version -> {
+        /*new UpdateChecker(this, 121838).getVersion(version -> {
             if (this.getDescription().getVersion().equals(version)) {
                 logger.info("There is not a new update available.");
             } else {
                 logger.warning(ChatColor.GOLD + "There is a new update available.");
             }
-        });
+        });*/
 
 
         logger.info("HuHoBot Loaded. By HuoHuas001");
@@ -200,7 +200,8 @@ public final class HuHoBot extends JavaPlugin {
      * @param command 命令
      * @param packId  消息包ID
      */
-    public void runCommand(String command, String packId) {
+    public void
+    runCommand(String command, String packId) {
         String sendCqMsg = ServerManager.sendCmd(command, true, true);
         clientManager.getClient().respone("已执行.\n" + sendCqMsg, "success", packId);
     }

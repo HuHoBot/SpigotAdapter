@@ -7,14 +7,14 @@ import net.md_5.bungee.api.ChatColor;
 import java.util.logging.Logger;
 
 public class Shaked extends EventRunner {
-    private HuHoBot plugin = HuHoBot.getPlugin();
-    private Logger logger = plugin.getLogger();
+    private final HuHoBot plugin = HuHoBot.getPlugin();
+    private final Logger logger = plugin.getLogger();
 
     private void shakedProcess() {
-        plugin.getClientManager().setShouldReconnect(true);
+        HuHoBot.getClientManager().setShouldReconnect(true);
         HuHoBot.getClientManager().cancelCurrentTask();
         HuHoBot.getClientManager().setAutoDisConnectTask();
-        plugin.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new SendHeart(), 0, 5 * 20);
+        HuHoBot.getScheduler().runTaskTimer(new SendHeart(), 0, 5 * 20);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class Shaked extends EventRunner {
                 break;
             case 3:
                 logger.severe(ChatColor.DARK_RED + "握手失败，客户端密钥错误.");
-                plugin.getClientManager().setShouldReconnect(false);
+                HuHoBot.getClientManager().setShouldReconnect(false);
                 break;
             case 6:
                 logger.info("与服务端握手成功，服务端等待绑定...");

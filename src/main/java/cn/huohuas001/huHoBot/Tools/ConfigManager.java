@@ -26,7 +26,6 @@ public class ConfigManager {
     public boolean checkConfig() {
         if (configFile.exists()) {
             int version = plugin.getConfig().contains("version") ? plugin.getConfig().getInt("version") : -1;
-            plugin.getLogger().info(String.valueOf(version));
             if (this.version > version) {
                 return false;
             }
@@ -106,7 +105,7 @@ public class ConfigManager {
             }
         } catch (IOException e) {
             plugin.getLogger().severe("配置文件迁移失败: " + e.getMessage());
-            e.printStackTrace();
+            plugin.getLogger().severe(e.getStackTrace().toString());
         }
     }
 

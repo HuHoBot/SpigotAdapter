@@ -37,6 +37,7 @@ public class ConsoleSender implements ConsoleCommandSender {
             sendMessage(msg);
     }
 
+
     public void sendMessage(@Nullable UUID sender, @NotNull String message) {
         ServerManager.msgList.add(message);
     }

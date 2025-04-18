@@ -2,6 +2,7 @@ name: HuHoBot
 version: '${version}'
 main: cn.huohuas001.huHoBot.HuHoBot
 api-version: 1.13
+folia-supported: true
 authors:
   - "HuoHuas001"
 description: HuHoBot Spigot Adapter
