@@ -1,5 +1,6 @@
 package cn.huohuas001.huHoBot;
 
+import cn.huohuas001.huHoBot.GameEvent.onChat;
 import cn.huohuas001.huHoBot.NetEvent.*;
 import cn.huohuas001.huHoBot.Tools.*;
 import com.alibaba.fastjson2.JSONObject;
@@ -91,7 +92,7 @@ public final class HuHoBot extends JavaPlugin {
         this.customCommand = new CustomCommand(this);
         customCommand.loadCommandsFromConfig();
 
-        //getServer().getPluginManager().registerEvents(new PlayerLoginListener(), this);
+        getServer().getPluginManager().registerEvents(new onChat(), this);
 
         //初始化事件
         totalRegEvent();
@@ -100,15 +101,11 @@ public final class HuHoBot extends JavaPlugin {
         clientManager = new WebsocketClientManager();
         clientManager.connectServer();
 
+        int pluginId = 25692;
+        Metrics metrics = new Metrics(this, pluginId);
 
-        /*new UpdateChecker(this, 121838).getVersion(version -> {
-            if (this.getDescription().getVersion().equals(version)) {
-                logger.info("There is not a new update available.");
-            } else {
-                logger.warning(ChatColor.GOLD + "There is a new update available.");
-            }
-        });*/
-
+        // Optional: Add custom charts
+        metrics.addCustomChart(new Metrics.SimplePie("chart_id", () -> "Use HuHoBot"));
 
         logger.info("HuHoBot Loaded. By HuoHuas001");
     }
@@ -160,7 +157,7 @@ public final class HuHoBot extends JavaPlugin {
      */
     public boolean isBind() {
         FileConfiguration config = getConfig();
-        return config.get("hashKey") != null;
+        return config.get("hashKey") != null || (!config.get("hashKey").equals(""));
     }
 
     /**
@@ -200,10 +197,11 @@ public final class HuHoBot extends JavaPlugin {
      * @param command 命令
      * @param packId  消息包ID
      */
-    public void
-    runCommand(String command, String packId) {
-        String sendCqMsg = ServerManager.sendCmd(command, true, true);
-        clientManager.getClient().respone("已执行.\n" + sendCqMsg, "success", packId);
+    public void runCommand(String command, String packId) {
+        HuHoBot.getScheduler().runTaskAsynchronously(() -> {
+            String sendCmdMsg = ServerManager.sendCmd(command, true, true);
+            clientManager.getClient().respone("已执行.\n" + sendCmdMsg, "success", packId);
+        });
     }
 
     /**

@@ -19,16 +19,14 @@ public class ConfigManager {
         this.plugin = plugin;
         this.configFile = new File(plugin.getDataFolder(), "config.yml");
         this.oldConfigFile = new File(plugin.getDataFolder(), "config_old.yml");
-        this.version = 2;
+        this.version = 3;
     }
 
     //检测是否该修改配置文件
     public boolean checkConfig() {
         if (configFile.exists()) {
             int version = plugin.getConfig().contains("version") ? plugin.getConfig().getInt("version") : -1;
-            if (this.version > version) {
-                return false;
-            }
+            return this.version > version;
         }
         return true;
     }
@@ -71,6 +69,7 @@ public class ConfigManager {
             plugin.saveDefaultConfig();
             plugin.reloadConfig();
             FileConfiguration newConfig = plugin.getConfig();
+            newConfig.set("version", this.version);
 
             // 3. 迁移旧配置数据
             if (oldConfigFile.exists()) {
@@ -82,27 +81,36 @@ public class ConfigManager {
 
                 // 迁移聊天格式
                 migrateNested(oldConfig, newConfig, "chatFormatGame", "chatFormat.from_game");
+                migrateNested(oldConfig, newConfig, "chatFormat.from_game", "chatFormat.from_game");
                 migrateNested(oldConfig, newConfig, "chatFormatGroup", "chatFormat.from_group");
+                migrateNested(oldConfig, newConfig, "chatFormat.from_group", "chatFormat.from_group");
+                if (!newConfig.contains("chatFormat.post_chat")) {
+                    newConfig.set("chatFormat.post_chat", true); // 设置默认值
+                }
+                if (!newConfig.contains("chatFormat.post_prefix")) {
+                    newConfig.set("chatFormat.post_prefix", ""); // 设置默认值
+                }
 
                 // 迁移MOTD设置
                 migrateServerUrl(oldConfig, newConfig);
 
                 // 迁移白名单命令
                 migrateNested(oldConfig, newConfig, "addWhiteListCmd", "whiteList.add");
+                migrateNested(oldConfig, newConfig, "whiteList.add", "whiteList.add");
                 migrateNested(oldConfig, newConfig, "delWhiteListCmd", "whiteList.del");
+                migrateNested(oldConfig, newConfig, "whiteList.del", "whiteList.del");
 
                 // 迁移自定义命令（保持结构不变）
                 if (oldConfig.isConfigurationSection("customCommand")) {
                     newConfig.set("customCommand", oldConfig.get("customCommand"));
                 }
 
-                // 设置新版本号
-                newConfig.set("version", this.version);
 
                 // 保存更新后的配置
-                plugin.saveConfig();
                 plugin.getLogger().info("配置文件迁移完成");
             }
+
+            plugin.saveConfig();
         } catch (IOException e) {
             plugin.getLogger().severe("配置文件迁移失败: " + e.getMessage());
             plugin.getLogger().severe(e.getStackTrace().toString());

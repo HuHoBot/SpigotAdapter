@@ -4,6 +4,8 @@ hashKey: null
 chatFormat:
   from_game: "<{name}> {msg}"
   from_group: "群:<{nick}> {msg}"
+  post_chat: true
+  post_prefix: ""
 
 motd:
   server_ip: "play.hypixel.net"
