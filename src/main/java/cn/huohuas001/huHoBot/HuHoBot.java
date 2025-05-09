@@ -26,6 +26,7 @@ public final class HuHoBot extends JavaPlugin {
     private final Map<String, EventRunner> eventList = new HashMap<>(); //事件列表
     private Logger logger; //Logger
     private CustomCommand customCommand; //自定义命令对象
+    public static ConfigManager configManager;
 
     /**
      * 获取插件
@@ -66,7 +67,7 @@ public final class HuHoBot extends JavaPlugin {
         logger = getLogger();
         scheduler = UniversalScheduler.getScheduler(this);
 
-        ConfigManager configManager = new ConfigManager(this);
+        configManager = new ConfigManager(this);
 
         if (configManager.checkConfig()) {
             configManager.migrateConfig();
@@ -157,14 +158,15 @@ public final class HuHoBot extends JavaPlugin {
      */
     public boolean isBind() {
         FileConfiguration config = getConfig();
-        return config.get("hashKey") != null || (!config.get("hashKey").equals(""));
+        String hashKey = config.getString("hashKey");
+        return hashKey != null && !hashKey.isEmpty();
     }
 
     /**
      * 在控制台输出绑定ID
      */
     public void sendBindMessage() {
-        if (!isBind()) {
+        if (!configManager.isHashKeyValue()) {
             String serverId = getConfig().getString("serverId");
             String message = "服务器尚未在机器人进行绑定，请在群内输入\"/绑定 " + serverId + "\"";
             logger.warning(message);

@@ -1,11 +1,11 @@
 package cn.huohuas001.huHoBot;
 
 
+import cn.huohuas001.huHoBot.Tools.ConfigManager;
 import cn.huohuas001.huHoBot.Tools.PackId;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -167,14 +167,10 @@ public class WsClient extends WebSocketClient {
      * 向服务端握手
      */
     private void shakeHand() {
-        FileConfiguration config = plugin.getConfig();
+        ConfigManager config = HuHoBot.configManager;
         JSONObject body = new JSONObject();
-        body.put("serverId", config.getString("serverId"));
-        if (config.get("hashKey") == null) {
-            body.put("hashKey", "");
-        } else {
-            body.put("hashKey", config.getString("hashKey"));
-        }
+        body.put("serverId", config.getServerId());
+        body.put("hashKey", config.getHashKey());
         body.put("name", plugin.getServerName());
         body.put("version", plugin.getDescription().getVersion());
         body.put("platform", "spigot");

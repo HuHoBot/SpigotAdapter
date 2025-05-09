@@ -1,10 +1,5 @@
-# HuHoBot-Spigot-Adapter v1.2.4
+# HuHoBot-Spigot-Adapter v1.2.6
 
-build:
-
-- 统一任务调度方法
-- 添加对`Folia`的支持
-
-fix:
-
-- 修复`/查在线`未安装PlaceholderAPI会报错的情况
+feat(BotQueryWhiteList): 添加BotQueryWhiteList请求白名单事件
+fix(sendBindMessage): 修复发送绑定信息时偶现报错问题
+update(QueryAllowList): 优化QueryAllowList流程

@@ -37,6 +37,7 @@ public class Shaked extends EventRunner {
             case 6:
                 logger.info("与服务端握手成功，服务端等待绑定...");
                 shakedProcess();
+                plugin.sendBindMessage();
                 break;
             default:
                 logger.severe(ChatColor.DARK_RED + "握手失败，原因" + msg);

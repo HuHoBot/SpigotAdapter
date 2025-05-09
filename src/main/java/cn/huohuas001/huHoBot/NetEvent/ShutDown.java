@@ -14,8 +14,8 @@ public class ShutDown extends EventRunner {
         logger.severe(ChatColor.DARK_RED + "服务端命令断开连接 原因:" + body.getString("msg"));
         logger.severe(ChatColor.DARK_RED + "此错误具有不可容错性!请检查插件配置文件!");
         logger.warning(ChatColor.GOLD + "正在断开连接...");
-        plugin.getClientManager().setShouldReconnect(false);
-        plugin.getClientManager().shutdownClient();
+        HuHoBot.getClientManager().setShouldReconnect(false);
+        HuHoBot.getClientManager().shutdownClient();
         return true;
     }
 }

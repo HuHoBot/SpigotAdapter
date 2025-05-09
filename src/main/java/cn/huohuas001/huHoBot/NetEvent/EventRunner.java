@@ -1,6 +1,7 @@
 package cn.huohuas001.huHoBot.NetEvent;
 
 import cn.huohuas001.huHoBot.HuHoBot;
+import cn.huohuas001.huHoBot.Tools.ConfigManager;
 import cn.huohuas001.huHoBot.WsClient;
 import com.alibaba.fastjson2.JSONObject;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,6 +22,10 @@ public class EventRunner {
 
     FileConfiguration getConfig() {
         return HuHoBot.getPlugin().getConfig();
+    }
+
+    ConfigManager getConfigManager() {
+        return HuHoBot.configManager;
     }
 
     void runCommand(String command) {

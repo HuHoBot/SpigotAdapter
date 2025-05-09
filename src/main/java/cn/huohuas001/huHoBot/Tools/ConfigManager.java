@@ -137,5 +137,44 @@ public class ConfigManager {
             }
         }
     }
+
+    public void saveConfig() {
+        plugin.saveConfig();
+        plugin.reloadBotConfig();
+    }
+
+    //Getter
+    public String getHashKey() {
+        FileConfiguration config = plugin.getConfig();
+        String hashKey = config.getString("hashKey");
+        if (hashKey == null || hashKey.isEmpty()) {
+            return "";
+        }
+        return hashKey;
+    }
+
+    //Setter
+    public void setHashKey(String hashKey) {
+        FileConfiguration config = plugin.getConfig();
+        config.set("hashKey", hashKey);
+        plugin.saveConfig();
+    }
+
+    public String getServerId() {
+        FileConfiguration config = plugin.getConfig();
+        String serverId = config.getString("serverId");
+        return serverId;
+    }
+
+    public void setServerId(String serverId) {
+        FileConfiguration config = plugin.getConfig();
+        config.set("serverId", serverId);
+        plugin.saveConfig();
+    }
+
+    public boolean isHashKeyValue() {
+        String hashKey = getHashKey();
+        return hashKey != null && !hashKey.isEmpty();
+    }
 }
 

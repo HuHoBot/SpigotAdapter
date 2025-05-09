@@ -101,7 +101,6 @@ public class WebsocketClientManager {
                 client = new WsClient(uri, this);
                 setShouldReconnect(true); // 设置是否重连
                 client.connect();
-                plugin.sendBindMessage();
             }
             return true;
         } catch (URISyntaxException e) {

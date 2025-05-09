@@ -36,7 +36,7 @@ public class CustomRun extends EventRunner {
         }
 
         //执行后判定是否有命令接收
-        if (!event.isCancelled()) {
+        if (!event.isCancelled() && !keyWord.startsWith("#")) {
             respone("未找到关键词" + keyWord + "对应的自定义事件", "error");
         }
     }
