@@ -21,7 +21,6 @@ public class CustomRunAdmin extends EventRunner {
         BotCustomCommand event = new BotCustomCommand(keyWord, body, packId, true);
         if (result == null) {
             Bukkit.getPluginManager().callEvent(event);
-            return;
         } else {
             String command = result.getCommand();
             for (int i = 0; i < param.size(); i++) {
@@ -29,6 +28,7 @@ public class CustomRunAdmin extends EventRunner {
                 command = command.replace("&" + replaceNum, param.get(i));
             }
             runCommand(command);
+            return;
         }
 
         //执行后判定是否有命令接收
