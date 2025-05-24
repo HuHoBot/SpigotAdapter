@@ -105,6 +105,24 @@ jobs:
           name: release-artifacts
           path: artifacts
 
+      - name: Setup workspace
+        run: |
+          echo '{"latest":"${{ github.ref_name }}"}' > artifacts/latest.json
+
+      - name: Upload to R2
+        uses: ryand56/r2-upload-action@latest
+        with:
+          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
+          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
+          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          r2-bucket: ${{ secrets.R2_BUCKET }}
+          source-dir: spigot
+          destination-dir: artifacts
+
+      - name: Get timestamp
+        id: get-time
+        run: echo "TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
       - name: Create Release
         uses: softprops/action-gh-release@v1  # 改用更可靠的 Action
         with:
@@ -114,7 +132,9 @@ jobs:
             ${{ steps.changelog.outputs.body }}
 
             ### 构建信息
-            - 构建时间: ${{ github.run_created_at }}
+            - 构建时间: ${{ steps.get-time.outputs.TIME }}
             - 提交哈希: [${{ github.sha }}](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})
           files: |
             artifacts/HuHoBot-*.jar
+            
+      
