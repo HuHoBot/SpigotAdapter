@@ -107,7 +107,8 @@ jobs:
 
       - name: Setup workspace
         run: |
-          echo '{"latest":"${{ github.ref_name }}"}' > artifacts/latest.json
+          VERSION=${GITHUB_REF_NAME#v}  # 去掉v前缀
+          echo '{"latest":"$VERSION"}' > artifacts/latest.json
 
       - name: Upload to R2
         uses: ryand56/r2-upload-action@latest
