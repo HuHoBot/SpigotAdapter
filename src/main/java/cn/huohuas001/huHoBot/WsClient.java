@@ -7,9 +7,14 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import net.md_5.bungee.api.ChatColor;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -23,12 +28,44 @@ public class WsClient extends WebSocketClient {
     private final WebsocketClientManager clientManager;
 
 
-    public WsClient(URI serverUri, WebsocketClientManager clientManager) {
+    /*public WsClient(URI serverUri, WebsocketClientManager clientManager) {
         super(serverUri);
         this.plugin = HuHoBot.getPlugin();
         this.logger = plugin.getLogger();
         this.clientManager = clientManager;
+    }*/
+    public WsClient(URI serverUri, WebsocketClientManager clientManager,
+                    Map<String, String> headers, SSLContext sslContext) {
+        super(serverUri, new Draft_6455(), headers, 10000); // 增加超时到10秒
+
+        try {
+            if (sslContext != null) {
+                SSLSocketFactory factory = sslContext.getSocketFactory();
+                SSLSocket socket = (SSLSocket) factory.createSocket();
+
+                // 强制启用TLS 1.2/1.3
+                socket.setEnabledProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
+
+                // 可选：设置支持的密码套件
+                socket.setEnabledCipherSuites(new String[]{
+                        "TLS_AES_128_GCM_SHA256",
+                        "TLS_AES_256_GCM_SHA384",
+                        "TLS_CHACHA20_POLY1305_SHA256",
+                        "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+                        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+                });
+
+                this.setSocket(socket);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("创建SSL socket失败", e);
+        }
+
+        this.plugin = HuHoBot.getPlugin();
+        this.logger = plugin.getLogger();
+        this.clientManager = clientManager;
     }
+
 
     @Override
     public void onOpen(ServerHandshake _da) {
@@ -60,12 +97,39 @@ public class WsClient extends WebSocketClient {
         clientManager.clientReconnect();
     }
 
-    @Override
+    /*@Override
     public void onError(Exception ex) {
+        logger.severe("详细错误信息: ");
+        ex.printStackTrace();
         logger.severe(ChatColor.DARK_RED + "连接发生错误!错误信息:" + ex.getMessage());
         clientManager.clientReconnect();
-    }
+    }*/
+    @Override
+    public void onError(Exception ex) {
+        logger.severe("=== SSL连接错误详情 ===");
+        logger.severe("错误类型: " + ex.getClass().getName());
+        logger.severe("错误信息: " + ex.getMessage());
 
+        if (ex.getCause() != null) {
+            logger.severe("根本原因: " + ex.getCause().getMessage());
+        }
+
+        try {
+            logger.severe("当前支持的SSL协议: " +
+                    String.join(", ", SSLContext.getDefault().getSupportedSSLParameters().getProtocols()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            logger.severe("当前启用的SSL协议: " +
+                    String.join(", ", SSLContext.getDefault().getDefaultSSLParameters().getProtocols()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+
+        ex.printStackTrace();
+        clientManager.clientReconnect();
+    }
 
 
     /**

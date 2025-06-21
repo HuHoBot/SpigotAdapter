@@ -3,10 +3,14 @@ package cn.huohuas001.huHoBot;
 import cn.huohuas001.config.ServerConfig;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
-import net.md_5.bungee.api.ChatColor;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class WebsocketClientManager {
@@ -90,24 +94,56 @@ public class WebsocketClientManager {
         }
     }
 
-    /**
-     * 连接HuHoBot服务器
-     */
     public boolean connectServer() {
-        logger.info(" 正在连接服务端...");
+        logger.info("正在连接服务端...");
         try {
             URI uri = new URI(websocketUrl);
             if (client == null || !client.isOpen()) {
-                client = new WsClient(uri, this);
-                setShouldReconnect(true); // 设置是否重连
+                // Cloudflare需要设置特殊头部
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Host", "agent-remote.txssb.cn");
+                headers.put("User-Agent", "HuHoBot/1.0");
+
+                // 创建带SSL上下文的客户端
+                SSLContext sslContext = createCloudflareSSLContext();
+                client = new WsClient(uri, this, headers, sslContext);
+
+                setShouldReconnect(true);
                 client.connect();
             }
             return true;
-        } catch (URISyntaxException e) {
-            logger.severe(ChatColor.DARK_RED + e.getStackTrace().toString());
+        } catch (Exception e) {
+            logger.severe("连接HuHoBot失败: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }
+
+    private SSLContext createCloudflareSSLContext() throws Exception {
+        SSLContext context = SSLContext.getInstance("TLS");
+        context.init(null, new TrustManager[]{
+                new X509TrustManager() {
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {
+                    }
+
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                        // 添加调试信息
+                /*logger.info("接受服务器证书: " +
+                    (chain != null && chain.length > 0 ? chain[0].getSubjectDN() : "无证书"));*/
+                    }
+
+                    public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                    }
+                }
+        }, new java.security.SecureRandom());
+
+        // 设置协议版本
+        context.getDefaultSSLParameters().setProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
+        return context;
+    }
+
+
 
     public boolean isOpen() {
         return client.isOpen();
