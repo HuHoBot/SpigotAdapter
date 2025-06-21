@@ -27,13 +27,6 @@ public class WsClient extends WebSocketClient {
     private Logger logger;
     private final WebsocketClientManager clientManager;
 
-
-    /*public WsClient(URI serverUri, WebsocketClientManager clientManager) {
-        super(serverUri);
-        this.plugin = HuHoBot.getPlugin();
-        this.logger = plugin.getLogger();
-        this.clientManager = clientManager;
-    }*/
     public WsClient(URI serverUri, WebsocketClientManager clientManager,
                     Map<String, String> headers, SSLContext sslContext) {
         super(serverUri, new Draft_6455(), headers, 10000); // 增加超时到10秒
