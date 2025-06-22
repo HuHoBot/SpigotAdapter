@@ -36,17 +36,10 @@ public class WsClient extends WebSocketClient {
                 SSLSocketFactory factory = sslContext.getSocketFactory();
                 SSLSocket socket = (SSLSocket) factory.createSocket();
 
-                // 强制启用TLS 1.2/1.3
-                socket.setEnabledProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
+                socket.setEnabledProtocols(socket.getSupportedProtocols());
 
-                // 可选：设置支持的密码套件
-                socket.setEnabledCipherSuites(new String[]{
-                        "TLS_AES_128_GCM_SHA256",
-                        "TLS_AES_256_GCM_SHA384",
-                        "TLS_CHACHA20_POLY1305_SHA256",
-                        "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-                        "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
-                });
+                String[] supportedCipherSuites = socket.getSupportedCipherSuites();
+                socket.setEnabledCipherSuites(supportedCipherSuites);
 
                 this.setSocket(socket);
             }
