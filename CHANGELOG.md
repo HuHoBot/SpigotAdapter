@@ -1,4 +1,4 @@
-# HuHoBot-Spigot-Adapter v1.3.0
+# HuHoBot-Spigot-Adapter v1.3.1
 
-- **feat(Websocket)**: 重置项目Websocket底层，提升至`wss://`协议
+- **feat(Websocket)**: 修复部分版本的Java不支持SSL连接.
 
