@@ -7,12 +7,9 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import net.md_5.bungee.api.ChatColor;
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -27,7 +24,7 @@ public class WsClient extends WebSocketClient {
     private Logger logger;
     private final WebsocketClientManager clientManager;
 
-    public WsClient(URI serverUri, WebsocketClientManager clientManager,
+    /*public WsClient(URI serverUri, WebsocketClientManager clientManager,
                     Map<String, String> headers, SSLContext sslContext) {
         super(serverUri, new Draft_6455(), headers, 10000); // 增加超时到10秒
 
@@ -47,6 +44,13 @@ public class WsClient extends WebSocketClient {
             throw new RuntimeException("创建SSL socket失败", e);
         }
 
+        this.plugin = HuHoBot.getPlugin();
+        this.logger = plugin.getLogger();
+        this.clientManager = clientManager;
+    }*/
+
+    public WsClient(URI serverUri, WebsocketClientManager clientManager) {
+        super(serverUri);
         this.plugin = HuHoBot.getPlugin();
         this.logger = plugin.getLogger();
         this.clientManager = clientManager;

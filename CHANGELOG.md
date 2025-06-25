@@ -1,4 +1,4 @@
-# HuHoBot-Spigot-Adapter v1.3.1
+# HuHoBot-Spigot-Adapter v1.3.2
 
-- **feat(Websocket)**: 修复部分版本的Java不支持SSL连接.
+- **feat(Websocket)**: 修复部分连接问题
 

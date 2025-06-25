@@ -3,14 +3,14 @@ package cn.huohuas001.huHoBot;
 import cn.huohuas001.config.ServerConfig;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
+import org.bukkit.ChatColor;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class WebsocketClientManager {
@@ -94,7 +94,7 @@ public class WebsocketClientManager {
         }
     }
 
-    public boolean connectServer() {
+    /*public boolean connectServer() {
         logger.info("正在连接服务端...");
         try {
             URI uri = new URI(websocketUrl);
@@ -115,6 +115,22 @@ public class WebsocketClientManager {
         } catch (Exception e) {
             logger.severe("连接HuHoBot失败: " + e.getMessage());
             e.printStackTrace();
+        }
+        return false;
+    }*/
+
+    public boolean connectServer() {
+        logger.info(" 正在连接服务端...");
+        try {
+            URI uri = new URI(websocketUrl);
+            if (client == null || !client.isOpen()) {
+                client = new WsClient(uri, this);
+                setShouldReconnect(true); // 设置是否重连
+                client.connect();
+            }
+            return true;
+        } catch (URISyntaxException e) {
+            logger.severe(ChatColor.DARK_RED + e.getStackTrace().toString());
         }
         return false;
     }
